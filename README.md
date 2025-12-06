@@ -26,7 +26,15 @@
 - Minimal dependencies — just SDL2
 - Reads from stdin for easy piping
 
+<div align="center">
 
+## 🎬 Demo
+
+<img src="docs/imageViewerGif.gif" alt="Demo" width=500>
+
+*Run the viewer and pipe in any PPM file*
+
+</div>
 
 <div align="center">
 
