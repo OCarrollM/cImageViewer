@@ -2,29 +2,60 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h> // Graphics Library, will need to include
 
-int main() {
-    printf("Hello World!\n");
+int main(){
+    FILE *pin = stdin;
+    char *pthrowaway = calloc(1000, sizeof(char));
+    // R first line
+    fgets(pthrowaway, 1000, pin);
+    // R second line and so on....
+    fgets(pthrowaway, 1000, pin);
+    char *pdimensions = calloc(1000, sizeof(char));
+    fgets(pdimensions, 1000, pin);
+    fgets(pthrowaway, 1000, pin);
+    
+    free(pthrowaway);
+
+    int width = -1;
+    int height = -1;
+    sscanf(pdimensions, "%d %d\n", &width, &height);
+    printf("width=%d\n, height=%d\n", width, height);
+
 
     SDL_Window *pwindow = SDL_CreateWindow("Image Viewer",
         SDL_WINDOWPOS_CENTERED, // x
         SDL_WINDOWPOS_CENTERED, // y
-        900, // height
-        600, // width
+        width, 
+        height, 
         0 // Flags
     );
     
     SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
-
-    Uint8 r,g,b;
-    r = 0xFF;
-    g = b = 0x00;
-    Uint32 color = SDL_MapRGB(psurface->format,r,g,b);
-
-    int x = 50;
-    int y = 50;
-    const SDL_Rect pixel = (SDL_Rect){x,y,1,1};
-    SDL_FillRect(psurface, &pixel, color);
+    
+    SDL_Rect pixel = (SDL_Rect){0,0,1,1};
+    Uint32 color = 0;
+    for(int y=0; y<height; y++){
+        for(int x=0; x<width; x++){
+            Uint8 r,g,b;
+            r = (char) getchar();
+            g = (char) getchar();
+            b = (char) getchar();
+            color = SDL_MapRGB(psurface->format,r,g,b);
+            pixel.x=x;
+            pixel.y=y;
+            SDL_FillRect(psurface, &pixel, color);
+        }
+    }
     
     SDL_UpdateWindowSurface(pwindow);
-    SDL_Delay(3000);
+    
+    int app_running = 1;
+    while(app_running){
+        SDL_Event event;
+        while(SDL_PollEvent(&event)){
+            if(event.type == SDL_QUIT){
+                app_running = 0;
+            }
+        }
+        SDL_Delay(100);
+    }
 }
