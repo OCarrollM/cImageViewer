@@ -11,29 +11,35 @@ int main(){
     }
 
     FILE *pin = stdin;
-    char *pthrowaway = calloc(1000, sizeof(char));
-    // R first line
-    fgets(pthrowaway, 1000, pin);
-    // R second line and so on....
-    fgets(pthrowaway, 1000, pin);
-    char *pdimensions = calloc(1000, sizeof(char));
-    fgets(pdimensions, 1000, pin);
-    fgets(pthrowaway, 1000, pin);
-    
-    free(pthrowaway);
 
-    int width = -1;
-    int height = -1;
-    sscanf(pdimensions, "%d %d\n", &width, &height);
-
-    if(width <= 0 || height <= 0){
-        fprintf(stderr, "Invalid Image Dimensions: %dx%d\n", width, height);
-        free(pdimensions);
+    char *pline = calloc(1000, sizeof(char));
+    fgets(pline, 1000, pin);
+    if(pline[0] != 'P' || pline[1] != '6'){
+        fprintf(stderr, "Not A Valid PPM File\n");
+        free(pline);
         SDL_Quit();
         return 1;
     }
-    //printf("width=%d\n, height=%d\n", width, height);
-    free(pdimensions);
+
+    do{
+        fgets(pline, 1000, pin);
+    } while(pline[0] == '#');
+
+    int width = -1;
+    int height = -1;
+    sscanf(pline, "%d %d", &width, &height);
+
+    do{
+        fgets(pline, 1000, pin);
+    } while(pline[0] == '#');
+
+
+    if(width <= 0 || height <= 0){
+        fprintf(stderr, "Invalid Image Dimensions: %dx%d\n", width, height);
+        SDL_Quit();
+        return 1;
+    }
+    free(pline);
 
 
     SDL_Window *pwindow = SDL_CreateWindow("Image Viewer",
@@ -45,7 +51,6 @@ int main(){
     );
     if(pwindow  == NULL){
         fprintf(stderr, "SDL_CreateWindow Failed: %s\n", SDL_GetError());
-        free(pdimensions);
         SDL_Quit();
         return 1;
     }
@@ -54,7 +59,7 @@ int main(){
     if(psurface == NULL){
         fprintf(stderr, "SDL_GetWindowSurface Failed: %s\n", SDL_GetError());
         SDL_DestroyWindow(pwindow);
-        free(pdimensions);
+        free(pline);
         SDL_Quit();
         return 1;
     }
